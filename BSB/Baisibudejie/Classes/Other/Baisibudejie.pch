@@ -1,0 +1,59 @@
+//
+//  Baisibudejie.pch
+//  Baisibudejie
+//
+//  Created by Vincent Rowe on 2017/2/22.
+//  Copyright © 2017年 Vincent. All rights reserved.
+//
+
+/*
+    pch
+    1.存放公用宏
+    2.存放公用头文件
+    3.自定义Log
+ */
+
+#import "VtcConst.h"
+
+#import "UIView+VtcFrame.h"
+#import "UIBarButtonItem+VtcItem.h"
+
+#import "AFHTTPSessionManager+VtcManager.h"
+
+#define VtcColor(r, g, b)[UIColor colorWithRed:(r) / 256.0 green:(g) / 256.0 blue:(b) / 256.0 alpha:1]
+
+//随机颜色
+#define VtcRandomColor VtcColor(arc4random_uniform(255), arc4random_uniform(255), arc4random_uniform(255))
+
+// 讲data写成.plist
+#define VtcAFNWriteToPlist(filename) [responseObject writeToFile:[NSString stringWithFormat:@"/Users/Vincent/Desktop/%@.plist", @#filename] atomically:YES]
+
+/********************** 屏幕适配 **********************/
+#define VtcScreenHeight [UIScreen mainScreen].bounds.size.height
+#define VtcScreenWidth [UIScreen mainScreen].bounds.size.width
+
+#define iPhone6P (VtcScreenHeight == 736)
+#define iPhone6 (VtcScreenHeight == 667)
+#define iPhone5 (VtcScreenHeight == 568)
+#define iPhone4 (VtcScreenHeight == 480)
+/**********************        **********************/
+
+#define VtcFunc VtcLog(@"%s", __func__)
+
+#ifdef DEBUG //调试
+
+#define VtcLog(...) NSLog(__VA_ARGS__)
+
+#else //发布
+
+#define VtcLog(...)
+
+#endif
+
+#ifndef Baisibudejie_pch
+#define Baisibudejie_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+#endif /* Baisibudejie_pch */
