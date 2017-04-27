@@ -75,7 +75,7 @@ typedef NS_ENUM(NSUInteger, VtcTopicType) {
 @property (nonatomic, assign, getter=isFooterRefreshing) BOOL footerRefreshing;
 
 /** 所有的帖子数据 */
-@property (nonatomic, strong) NSMutableArray *topics;
+@property (nonatomic, strong) NSMutableArray<VtcTopicItem *> *topics;
 
 
 /** 下拉刷新 */
@@ -123,6 +123,9 @@ static NSString * const VtcTopicCellID = @"VtcTopicCellID";
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
 //    VtcLog(@"%@", self.view);
+    
+    // 计算cell的估算高度（每一行大约都是44）
+//    self.tableView.estimatedRowHeight = 44;
     
     
     self.tableView.scrollIndicatorInsets = self.tableView.contentInset;
@@ -363,7 +366,7 @@ static NSString * const VtcTopicCellID = @"VtcTopicCellID";
 //        VtcLog(@"%@", responseObject);
 
         // 清空之前计算的cell的高度
-        [self.cellHeightDict removeAllObjects];
+//        [self.cellHeightDict removeAllObjects];
         
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         
@@ -581,11 +584,29 @@ static NSString * const VtcTopicCellID = @"VtcTopicCellID";
 }
 
 #pragma mark - 代理方法
+// 所有cell的高度 -> cotentSize.height -> 滚动条长度
+
+// 估算高度使用
+// self.tableView.estimatedRowHeight * 总数量 -> contentSize.height -> 滚动条长度
+
+/**
+ 使用estimatedRowHeight的优缺点
+ 1.优点
+    1> 可以降低tableView：heightForRowAtIndexPath方法的调用频率
+    2> 将【计算cell高度的操作】延迟执行了（相当于cell高度的计算是懒加载的）
+ 2.缺点
+    1> 滚动条长度不准确、不稳定，甚至有卡顿效果（如果不使用estimatedRowHeight，滚动条的长度就是准确的）
+ 
+ */
+
 /**
  这个方法的特点：
- 1.默认情况下
+ 1.默认情况下（没有设置estimatedRowHeight的情况下）
     1>每次刷新表格的时候，有多少数据，这个方法就一次性调用多少次（如果有100条数据，每次reloadData,这个方法就会一次性调用100次）
     2>每当有cell进入屏幕范围内，就会调用一次这个方法
+ 
+ 2.设置estimatedRowHeight的情况下
+    1> 用到了（显示）哪个cell，才会调用这个方法去计算那个cell的高度（方法调用频率降低了）
  */
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     
@@ -628,19 +649,9 @@ static NSString * const VtcTopicCellID = @"VtcTopicCellID";
 //    [UIFont systemFontOfSize:15].lineHeight;
     
     // *********************************** 第二种方法 *********************************** //
-    CGFloat cellHeight = 0;
+//    return topic.cellHeight;
     
-    // 文字的Y值
-    cellHeight += 55;
-    
-    // 文字的高度
-    CGSize textMaxSize = CGSizeMake(VtcScreenWidth - 2 * VtcMargin, MAXFLOAT);
-    cellHeight += [topic.text boundingRectWithSize:textMaxSize options:0 attributes:@{NSFontAttributeName : [UIFont systemFontOfSize:15]} context:nil].size.height + VtcMargin;
-    
-    // 工具条
-    cellHeight += 35 + 2 * VtcMargin;
-    
-    return cellHeight;
+    return self.topics[indexPath.row].cellHeight;
 }
 
 #pragma mark - UITableViewDelegate

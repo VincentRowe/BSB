@@ -41,4 +41,10 @@
 /** 帖子的类型 10为图片 29为段子 31为音频 41为视频 */
 @property (nonatomic, assign) NSInteger type;
 
+
+/** 额外增加的属性（并非服务器返回的属性，仅仅是为了提高开发效率） */
+/** 根据当前模型计算出来的cell高度 */
+@property (nonatomic, assign) CGFloat cellHeight;
+
+
 @end
